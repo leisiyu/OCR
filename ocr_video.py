@@ -4,7 +4,7 @@ import json
 import os
 
 
-def extract_keyframes_and_ocr(video_path, frame_interval=30, output_json="ocr_output.json", roi=None):
+def extract_keyframes_and_ocr(video_path, frame_interval=30, output_json="ocr_output.json", roi=None, time_roi=None):
     """
     Extracts key frames from a video, performs OCR, and saves results to JSON.
 
@@ -35,16 +35,25 @@ def extract_keyframes_and_ocr(video_path, frame_interval=30, output_json="ocr_ou
             timestamp_sec = frame_count / fps
 
             # Apply ROI crop if provided
+            text_frame = frame
             if roi:
                 x, y, w, h = roi
-                frame = frame[y:y+h, x:x+w]
+                text_frame = frame[y:y+h, x:x+w]
 
-            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            rgb_frame = cv2.cvtColor(text_frame, cv2.COLOR_BGR2RGB)
             text = pytesseract.image_to_string(rgb_frame)
+
+            time_frame = frame
+            if time_roi:
+                x, y, w, h = time_roi
+                time_frame = frame[y:y+h, x:x+w]
+            rgb_time_frame = cv2.cvtColor(time_frame, cv2.COLOR_BGR2RGB)
+            time = pytesseract.image_to_string(rgb_time_frame)
 
             results.append({
                 "timestamp": round(timestamp_sec, 2),
-                "text": text.strip()
+                "text": text.strip(),
+                "ingame_time": time.strip()
             })
 
         frame_count += 1
@@ -63,5 +72,6 @@ if __name__ == "__main__":
     extract_keyframes_and_ocr(
         "sims4.mp4",
         frame_interval=240,
-        roi=(1000, 0, 400, 150)  # <-- change this to your area
+        roi=(2600, 0, 472, 400),  # <-- change this to your area
+        time_roi = (1400, 1800, 180, 100)
     )
