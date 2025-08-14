@@ -72,6 +72,6 @@ if __name__ == "__main__":
     extract_keyframes_and_ocr(
         "sims4.mp4",
         frame_interval=240,
-        roi=(2600, 0, 472, 400),  # <-- change this to your area
-        time_roi = (1400, 1800, 180, 100)
+        roi=(2600, 0, 472, 400),  # change this to your area, default = None
+        time_roi = (1400, 1800, 180, 100)  # change this to the in-game time area, default = None
     )
